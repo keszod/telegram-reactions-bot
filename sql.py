@@ -56,5 +56,9 @@ class SQLighter:
 		with self.connection:
 			return self.execute(f"UPDATE `posts` SET `{param}` = ? WHERE `channel_id` = ? AND `message_id` = ?",(str(reactions),str(channel_id),str(message_id),))
 
+	def update_forward(self,channel_id,message_id):
+		with self.connection:
+			return self.execute(f"UPDATE `posts` SET `is_forward` = ? WHERE `channel_id` = ? AND `message_id` = ?",(1,str(channel_id),str(message_id),))
+
 	def close(self):
 		self.connection.close()

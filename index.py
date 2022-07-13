@@ -54,6 +54,9 @@ def check_messages():
 			db.add_post(channel_id,message_id,date)
 			print(channel_id,message_id,'added')
 
+@app.on_message()
+def what_channel(client,message):
+	print(message.chat.id)
 
 def forward_message(channel_id,message_id,precent,average):
 	average_dict = {-2:'30 минут',-1:'1 час'}
@@ -61,8 +64,8 @@ def forward_message(channel_id,message_id,precent,average):
 	with app:
 		text = f'У сообщения больше реакций за {average} на {precent}% чем в среднем'
 		
-		app.send_message(chat_id=-719380975,text=text)
-		app.forward_messages(chat_id=-719380975,from_chat_id=int(channel_id),message_ids=int(message_id))
+		app.send_message(chat_id=-727487371,text=text)
+		app.forward_messages(chat_id=-727487371,from_chat_id=int(channel_id),message_ids=int(message_id))
 
 def check_reactions(chat_id,message_id):	
 	with app:
@@ -90,7 +93,7 @@ def check_channels():
 	channels = db.get_all_channels()
 
 	for channel in channels:
-		channel = channel[0]
+		channel = channel[1]
 		all_30 = 0
 		all_60 = 0
 		posts = db.get_channels_post(channel)
@@ -103,8 +106,11 @@ def check_channels():
 			if diff.days > 2:
 				continue
 			
-			all_30 += int(post[4])
-			all_60 += int(post[5])
+			if int(post[-1]) == 0:
+				continue
+			
+			all_30 += int(post[-2])
+			all_60 += int(post[-1])
 			count += 1
 		
 		if count == 0:
@@ -115,12 +121,12 @@ def check_channels():
 
 		db.update_channel(channel,average_30,average_60)
 
-	set_time(3)
+	set_time()
 
 
-def set_time(days):
+def set_time():
 	with open('time_set.txt','w',encoding='utf-8-sig') as file:
-		file.write((datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y %H:%M:%S'))
+		file.write((datetime.now() + timedelta(days=1)).strftime('%d-%m-%Y %H:%M:%S'))
 
 def checking_posts():
 	while True:
@@ -157,17 +163,20 @@ def checking_posts():
 				if channel_average == 0:
 					continue
 				
-				precent = (int(reactions)-channel_average)//channel_average*100
+				precent = int((int(reactions)-channel_average)/channel_average*100)
 				print(precent)
 				
-				if precent > 15:
+				if precent > 15 and int(post[4]) != 1:
 					forward_message(*post[1:3],precent,average_dict[param])
+					db.update_forward(*post[1:3])
 		
 		check_messages()
 		
 		sleep(1)
 
+#app.run()
 #checking_posts()
-#set_time(1)
+#set_time()
 checking_posts()
+#check_channels()
 #app.run()#-719380975
