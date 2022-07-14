@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import traceback
 from threading import Thread
 from pyrogram import Client, filters
 import asyncio
@@ -56,20 +57,19 @@ def check_messages():
 
 @app.on_message()
 def what_channel(client,message):
-	print(message.chat.id)
+        print(message.chat.id)
 
 def forward_message(channel_id,message_id,precent,average):
-	average_dict = {-2:'30 минут',-1:'1 час'}
-	average = average_dict[average]
-	with app:
-		text = f'У сообщения больше реакций за {average} на {precent}% чем в среднем'
+        print('forwarding')
+        with app:
+	        text = str(precent)+'%'
 		
 		app.send_message(chat_id=-727487371,text=text)
 		app.forward_messages(chat_id=-727487371,from_chat_id=int(channel_id),message_ids=int(message_id))
 
 def check_reactions(chat_id,message_id):	
 	with app:
-		reactions = app.get_messages(int(chat_id), int(message_id)).reactions
+	        reactions = app.get_messages(int(chat_id), int(message_id)).reactions
 	count = 0
 	
 	if not reactions:
@@ -177,6 +177,11 @@ def checking_posts():
 #app.run()
 #checking_posts()
 #set_time()
-checking_posts()
+while True:
+    try:
+        checking_posts()
+    except:
+        traceback.print_exc()
+
 #check_channels()
 #app.run()#-719380975
