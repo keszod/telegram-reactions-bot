@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import traceback
 from threading import Thread
 from pyrogram import Client, filters
 import asyncio
@@ -8,12 +7,17 @@ from time import sleep
 from sql import	SQLighter
 from datetime import datetime, timezone, timedelta
 import re
+import traceback
 from telethon.sync import TelegramClient
 from telethon import functions, types
+ 
+with open('data.txt','r',encoding='utf-8-sig') as file:
+	api_id,api_hash = file.read().splitlines()
+	api_id = int(api_id)
 
+with open('chat_id.txt','r') as file:
+	chat_id = int(file.read())
 
-api_id = 19626823
-api_hash = "b7d11e9fd7349b31ede4a5e31e41d9da"
 app = Client('my_account',api_id=api_id, api_hash=api_hash)
 client = TelegramClient('name', api_id, api_hash)
 
@@ -57,19 +61,18 @@ def check_messages():
 
 @app.on_message()
 def what_channel(client,message):
-        print(message.chat.id)
+	print(message.chat.id)
 
 def forward_message(channel_id,message_id,precent,average):
-        print('forwarding')
-        with app:
-	        text = str(precent)+'%'
+	with app:
+		text = f'{precent}%'
 		
-		app.send_message(chat_id=-727487371,text=text)
-		app.forward_messages(chat_id=-727487371,from_chat_id=int(channel_id),message_ids=int(message_id))
+		app.send_message(chat_id=chat_id,text=text)
+		app.forward_messages(chat_id=chat_id,from_chat_id=int(channel_id),message_ids=int(message_id))
 
 def check_reactions(chat_id,message_id):	
 	with app:
-	        reactions = app.get_messages(int(chat_id), int(message_id)).reactions
+		reactions = app.get_messages(int(chat_id), int(message_id)).reactions
 	count = 0
 	
 	if not reactions:
@@ -121,12 +124,12 @@ def check_channels():
 
 		db.update_channel(channel,average_30,average_60)
 
-	set_time()
+	set_time(3)
 
 
-def set_time():
+def set_time(days):
 	with open('time_set.txt','w',encoding='utf-8-sig') as file:
-		file.write((datetime.now() + timedelta(days=1)).strftime('%d-%m-%Y %H:%M:%S'))
+		file.write((datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y %H:%M:%S'))
 
 def checking_posts():
 	while True:
@@ -176,12 +179,11 @@ def checking_posts():
 
 #app.run()
 #checking_posts()
-#set_time()
+set_time(1)
 while True:
-    try:
-        checking_posts()
-    except:
-        traceback.print_exc()
-
+	try:
+		checking_posts()
+	except:
+		traceback.print_exc()
 #check_channels()
 #app.run()#-719380975
