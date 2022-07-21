@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 class SQLighter:
 
@@ -60,5 +61,18 @@ class SQLighter:
 		with self.connection:
 			return self.execute(f"UPDATE `posts` SET `is_forward` = ? WHERE `channel_id` = ? AND `message_id` = ?",(1,str(channel_id),str(message_id),))
 
+	def delete_all(self):
+		with self.connection:
+			self.execute("DELETE FROM channels;")
+			self.execute("DELETE FROM posts;")
+
 	def close(self):
 		self.connection.close()
+
+
+if __name__ == '__main__':
+	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+	db_path = os.path.join(BASE_DIR, "db.db")
+
+	db = SQLighter(db_path)
+	db.delete_all()
