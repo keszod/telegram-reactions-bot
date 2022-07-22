@@ -145,9 +145,11 @@ def checking_posts():
 			average_dict = {'reactions_for_30_min':-2,'reations_for_1_h':-1}
 
 			if diff.seconds in range(30*60,80*60):	
-                                reactions = check_reactions(*post[1:3])
-				
-                                print('reactions',reactions)
+				try:
+					reactions = check_reactions(*post[1:3])
+				except:
+					continue
+				print('reactions',reactions)
 				if reactions == 0:
 					continue
 				
