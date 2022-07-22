@@ -61,7 +61,7 @@ def check_messages():
 
 @app.on_message()
 def what_channel(client,message):
-	print(message.chat.id)
+	print(message.chat.id,message.text)
 
 def forward_message(channel_id,message_id,precent,average):
 	with app:
@@ -144,9 +144,10 @@ def checking_posts():
 			
 			average_dict = {'reactions_for_30_min':-2,'reations_for_1_h':-1}
 
-			if diff.seconds in range(30*60,80*60):
-				reactions = check_reactions(*post[1:3])
-				print('reactions',reactions)
+			if diff.seconds in range(30*60,80*60):	
+                                reactions = check_reactions(*post[1:3])
+				
+                                print('reactions',reactions)
 				if reactions == 0:
 					continue
 				
@@ -179,7 +180,9 @@ def checking_posts():
 
 #app.run()
 #checking_posts()
-set_time(1)
+#set_time(1)
+with app:
+    app.send_message(chat_id=int(chat_id),text='test')
 while True:
 	try:
 		checking_posts()
